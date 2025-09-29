@@ -205,7 +205,48 @@ db.collection("users").doc(currentUser.uid).set({
     alert("Incorrect captcha.");
   }
 
+document.getElementById("submit-captcha").addEventListener("click", ()=>{
+  const input = document.getElementById("captcha-input").value.trim().toUpperCase();
+  const captcha = document.getElementById("captcha").innerText;
+  const now = new Date().toLocaleString();
+  const adPlaceholder = document.getElementById("ad-placeholder");
 
+  if(input === captcha && timeLeft > 0){
+    // Update points
+    points += 0.0001;
+    document.getElementById("points").innerText = points.toFixed(4);
+
+    // Update Firestore
+    db.collection("users").doc(currentUser.uid).set({
+      email: currentUser.email,
+      points,
+      captchaCount: firebase.firestore.FieldValue.increment(1),
+      lastActivity: now
+    }, { merge: true });
+
+    // Show ad
+    adPlaceholder.style.display = "block";
+    adPlaceholder.innerHTML = ""; // Clear previous ad if any
+    const adScript = document.createElement("script");
+    adScript.type = "text/javascript";
+    adScript.src = "//pl27748745.revenuecpmgate.com/2c/26/f7/2c26f77347d03aa931ff62d54f478dd0.js";
+    adPlaceholder.appendChild(adScript);
+
+    // Hide ad after 10 seconds
+    setTimeout(()=>{
+      adPlaceholder.style.display = "none";
+      adPlaceholder.innerHTML = ""; // Remove ad script
+    }, 10000);
+
+    alert("Correct! +0.0001 points earned.");
+  } else if(timeLeft <= 0){
+    alert("Time expired!");
+  } else {
+    alert("Incorrect captcha.");
+  }
+
+  generateCaptcha(); // Refresh captcha for next round
+});
 // Reset Timer
 function resetTimer(){
   clearInterval(timer);
