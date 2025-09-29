@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  font-family: "Inter", system-ui, Arial, sans-serif;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #f1f5f9;
+  padding:20px;
+}
+h1 {text-align:center; color:#38bdf8;}
+table {width:100%; border-collapse:collapse; margin-top:20px;}
+th, td {padding:12px; border:1px solid rgba(255,255,255,0.2); text-align:center;}
+th {background:#2563eb;}
+tr:nth-child(even){background:rgba(255,255,255,0.05);}
+button {padding:10px 14px; background:#3b82f6; color:white; border:none; border-radius:6px; cursor:pointer; margin-top:10px;}
+button:hover {background:#2563eb;}
+</style>
+</head>
+<body>
+
+<h1>Admin Dashboard</h1>
+<button onclick="logout()">Logout</button>
+<table>
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Points</th>
+      <th>Captcha Count</th>
+      <th>Last Activity</th>
+    </tr>
+  </thead>
+  <tbody id="user-table">
+    <tr><td colspan="4">Loading...</td></tr>
+  </tbody>
+</table>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script>
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBjkSg5mcAdcNLtNXVEt3OWBnyJYc0kSM4",
+  authDomain: "captcha-e2954.firebaseapp.com",
+  projectId: "captcha-e2954",
+  storageBucket: "captcha-e2954.appspot.com",
+  messagingSenderId: "564130348715",
+  appId: "1:564130348715:web:f36424d02592a94406c1ee"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Only allow admin email
+const ADMIN_EMAIL = "raman.rnandhu@gmail.com";
+
+auth.onAuthStateChanged(user=>{
+  if(!user || user.email !== ADMIN_EMAIL){
+    alert("Unauthorized!"); window.location.href = "admin-login.html";
+  } else {
+    loadUsers();
+  }
+});
+
+function loadUsers(){
+  const tbody = document.getElementById("user-table");
+  tbody.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
+
+  db.collection("users").orderBy("lastActivity","desc").get()
+    .then(snapshot=>{
+      tbody.innerHTML = "";
+      snapshot.forEach(doc=>{
+        const data = doc.data();
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${data.email || "-"}</td>
+          <td>${data.points?.toFixed(4) || 0}</td>
+          <td>${data.captchaCount || 0}</td>
+          <td>${data.lastActivity || "-"}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      if(snapshot.empty){ tbody.innerHTML="<tr><td colspan='4'>No users found</td></tr>"; }
+    })
+    .catch(err=>{
+      tbody.innerHTML = `<tr><td colspan='4'>Error: ${err.message}</td></tr>`;
+    });
+}
+
+// Logout admin
+function logout(){
+  auth.signOut().then(()=>window.location.href="admin-login.html");
+}
+</script>
+</body>
+</html>
