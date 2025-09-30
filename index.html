@@ -5,75 +5,57 @@
 <title>NK CAPTCHA</title>
 <style>
 /* Reset */
-* {margin:0; padding:0; box-sizing:border-box;}
-body {
-  font-family: "Inter", system-ui, Arial, sans-serif;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: #f1f5f9;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:"Inter",system-ui,Arial,sans-serif;
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  color:#f1f5f9;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:20px;
 }
-nav {display:flex; justify-content:center; gap:20px; margin-bottom:20px; flex-wrap:wrap;}
-nav a {color:#38bdf8; font-weight:600; text-decoration:none; transition:0.3s;}
-nav a:hover{text-decoration:underline; color:#facc15;}
-.container {width:100%; max-width:420px; background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); padding:28px; border-radius:16px; box-shadow:0 8px 28px rgba(0,0,0,0.6);}
-h1,h2,h3{text-align:center;margin-bottom:18px;color:#38bdf8;font-weight:600;}
-form{display:flex; flex-direction:column; gap:14px;}
-input{padding:12px;border-radius:8px;border:none;outline:none;font-size:14px;background:rgba(255,255,255,0.1);color:#f1f5f9;transition:0.3s;}
+.container{
+  width:100%;max-width:420px;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(12px);
+  padding:28px;border-radius:16px;
+  box-shadow:0 8px 28px rgba(0,0,0,0.6);
+}
+h1,h2{text-align:center;margin-bottom:18px;color:#38bdf8;font-weight:600;}
+form{display:flex;flex-direction:column;gap:14px;}
+input{padding:12px;border-radius:8px;border:none;outline:none;
+  font-size:14px;background:rgba(255,255,255,0.1);color:#f1f5f9;}
 input:focus{background:rgba(255,255,255,0.2);border:1px solid #38bdf8;}
-button{padding:12px;border:none;border-radius:8px;background:#3b82f6;color:white;font-weight:600;cursor:pointer;transition:0.3s;}
+button{padding:12px;border:none;border-radius:8px;background:#3b82f6;
+  color:white;font-weight:600;cursor:pointer;}
 button:hover{background:#2563eb;transform:translateY(-2px);}
-button:disabled{background:#475569;cursor:not-allowed;}
-.switch-link{text-align:center;margin-top:10px;font-size:14px;color:#94a3b8;}
-.switch-link span{color:#38bdf8; cursor:pointer; font-weight:600;}
-.switch-link span:hover{text-decoration:underline;}
-.captcha-box{margin:18px 0; display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.08); padding:10px; border-radius:8px;}
-.captcha-code{font-size:20px; font-weight:bold; letter-spacing:3px; color:#facc15;}
-.refresh-btn{background:#f43f5e; border:none; color:white; padding:8px 12px; border-radius:6px; cursor:pointer; transition:0.3s;}
-.refresh-btn:hover{background:#e11d48;}
-.dashboard{text-align:center;}
-.points{font-size:18px; font-weight:bold; margin:12px 0; color:#22c55e;}
-#timer-section{margin:20px 0;text-align:center;}
-#timer-bar-container{width:100%; height:10px; background:rgba(255,255,255,0.2); border-radius:5px; overflow:hidden;}
-#timer-bar{height:100%; width:100%; background:#22c55e; transition:width 1s linear;}
-#status-msg{text-align:center;margin-bottom:12px;font-size:14px;color:#facc15;}
-/* ✅ Ad Modal */
-#ad-modal{display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-  background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:9999;}
-#ad-modal-content{background:#1e293b; padding:20px; border-radius:12px; max-width:420px; width:90%; text-align:center; position:relative;}
-#ad-modal h3{color:#38bdf8; margin-bottom:12px;}
-.close-btn{position:absolute; top:10px; right:10px; background:#f43f5e; color:white; border:none; padding:5px 10px; border-radius:6px; cursor:pointer;}
-@media(max-width:500px){.container{padding:20px;} h1{font-size:22px;}}
+.captcha-box{margin:18px 0;display:flex;justify-content:space-between;
+  align-items:center;background:rgba(255,255,255,0.08);padding:10px;
+  border-radius:8px;}
+.captcha-code{font-size:20px;font-weight:bold;letter-spacing:3px;color:#facc15;}
+#progress-container{width:100%;height:10px;background:rgba(255,255,255,0.2);
+  border-radius:5px;overflow:hidden;margin-top:12px;}
+#progress-bar{height:100%;width:0%;background:#22c55e;transition:width 1s linear;}
+#ad-placeholder{margin-top:12px;padding:10px;text-align:center;display:none;
+  background:#111827;border-radius:6px;}
 </style>
 </head>
 <body>
-
-<nav>
-  <a href="index.html">Home</a>
-  <a href="about.html">About</a>
-  <a href="privacy.html">Privacy</a>
-  <a href="terms.html">Terms</a>
-  <a href="admin-login.html">Admin</a>
-</nav>
-
 <div class="container">
   <h1>NK CAPTCHA</h1>
-  <div id="status-msg">Connecting to server...</div>
 
+  <!-- Signup -->
   <div id="signup-section" style="display:none;">
     <h2>Sign Up</h2>
     <form id="signup-form">
       <input type="email" id="signup-email" placeholder="Email" required>
       <input type="password" id="signup-password" placeholder="Password" required>
-      <label><input type="checkbox" id="terms-checkbox"> I agree to the <a href="terms.html" target="_blank">Terms & Conditions</a></label>
+      <label><input type="checkbox" id="terms-checkbox"> I agree to Terms</label>
       <button type="submit">Sign Up</button>
     </form>
-    <div class="switch-link">Already have an account? <span onclick="showLogin()">Login</span></div>
+    <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
   </div>
 
+  <!-- Login -->
   <div id="login-section" style="display:none;">
     <h2>Login</h2>
     <form id="login-form">
@@ -81,47 +63,40 @@ button:disabled{background:#475569;cursor:not-allowed;}
       <input type="password" id="login-password" placeholder="Password" required>
       <button type="submit">Login</button>
     </form>
-    <div class="switch-link">Don't have an account? <span onclick="showSignup()">Sign Up</span></div>
+    <p>Don't have an account? <a href="#" onclick="showSignup()">Sign Up</a></p>
   </div>
 
+  <!-- Dashboard -->
   <div id="dashboard" style="display:none;">
     <h2>Dashboard</h2>
-    <p class="points">Points: <span id="points">0</span></p>
+    <p>Points: <span id="points">0</span></p>
+
     <div class="captcha-box">
-      <span class="captcha-code" id="captcha"></span>
-      <button class="refresh-btn" onclick="generateCaptcha()">↻</button>
+      <span class="captcha-code" id="captcha-text"></span>
+      <button onclick="generateCaptcha()">↻</button>
     </div>
 
     <input type="text" id="captcha-input" placeholder="Enter Captcha">
-    <button id="submit-captcha">Submit</button>
+    <button id="verify-btn">Submit</button>
     <button onclick="logout()">Logout</button>
 
-    <div id="timer-section">
-      <h3>Captcha Timer</h3>
-      <div id="timer-bar-container">
-        <div id="timer-bar"></div>
-      </div>
+    <div id="progress-container">
+      <div id="progress-bar"></div>
     </div>
+    <p id="time-left"></p>
+
+    <!-- Ad box -->
+    <div id="ad-placeholder"></div>
   </div>
 </div>
 
-<!-- ✅ Ad Popup Modal -->
-<div id="ad-modal">
-  <div id="ad-modal-content">
-    <button class="close-btn" onclick="closeAd()">✖</button>
-    <h3>Sponsored Ad</h3>
-    <!-- Rajing Ad Code -->
-    <script src="https://rajing.com/gpt-5?h=waWQiOjExNjcwNDIsInNpZCI6MTU1OTgzMiwid2lkIjo3MjMyODAsInNyYyI6Mn0=eyJ&si1=&si2=" async></script>
-  </div>
-</div>
-
-<!-- Firebase SDK -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
 <script>
-// Firebase config
+// ================= FIREBASE INIT =================
 const firebaseConfig = {
   apiKey: "AIzaSyBjkSg5mcAdcNLtNXVEt3OWBnyJYc0kSM4",
   authDomain: "captcha-e2954.firebaseapp.com",
@@ -134,161 +109,91 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ---------------- Variables ----------------
-let currentUser = null, points = 0;
-let timer, timeLeft = 30;
-const TIMER_DURATION = 30;
+let currentUser = null, points = 0, timerInterval, currentCaptcha = "";
+let totalTime = 15; // seconds
 
-const statusMsg = document.getElementById("status-msg");
+// ================= UI FUNCTIONS =================
+function showLogin(){document.getElementById("signup-section").style.display="none";document.getElementById("login-section").style.display="block";}
+function showSignup(){document.getElementById("login-section").style.display="none";document.getElementById("signup-section").style.display="block";}
+function showDashboard(){document.getElementById("signup-section").style.display="none";document.getElementById("login-section").style.display="none";document.getElementById("dashboard").style.display="block";generateCaptcha();}
 
-// ---------------- UI ----------------
-function showLogin(){ document.getElementById("signup-section").style.display="none"; document.getElementById("login-section").style.display="block";}
-function showSignup(){ document.getElementById("login-section").style.display="none"; document.getElementById("signup-section").style.display="block";}
-function showDashboard(){ 
-  document.getElementById("signup-section").style.display="none";
-  document.getElementById("login-section").style.display="none";
-  document.getElementById("dashboard").style.display="block";
-  generateCaptcha();
-  startTimer();
-}
-
-// ---------------- Enable UI on load ----------------
-function enableUI(){
-  statusMsg.style.display="none";
-  showSignup();
-}
-
-auth.onAuthStateChanged(user=>{
-  if(user){
-    currentUser = user;
-    db.collection("users").doc(currentUser.uid).get().then(doc=>{
-      points = doc.exists? doc.data().points : 0;
-      document.getElementById("points").innerText = points.toFixed(4);
-      showDashboard();
-      enableUI();
-    }).catch(enableUI);
-  } else {
-    enableUI();
-  }
-});
-
-// ---------------- Signup ----------------
-document.getElementById("signup-form").addEventListener("submit", e=>{
+// ================= AUTH =================
+document.getElementById("signup-form").addEventListener("submit",e=>{
   e.preventDefault();
-  const email = document.getElementById("signup-email").value;
-  const password = document.getElementById("signup-password").value;
-  const termsChecked = document.getElementById("terms-checkbox").checked;
-  if(!termsChecked){ alert("Please agree to Terms & Conditions."); return; }
-
-  auth.createUserWithEmailAndPassword(email,password)
-    .then(userCredential=>{
-      currentUser = userCredential.user;
-      points = 0;
-      db.collection("users").doc(currentUser.uid).set({email: currentUser.email, points, captchaCount: 0, lastActivity: new Date().toLocaleString()})
-        .then(()=> showDashboard());
-      document.getElementById("points").innerText = points.toFixed(4);
-    })
-    .catch(error=>alert(error.message));
+  const email=document.getElementById("signup-email").value;
+  const password=document.getElementById("signup-password").value;
+  if(!document.getElementById("terms-checkbox").checked){alert("Agree to Terms");return;}
+  auth.createUserWithEmailAndPassword(email,password).then(userCred=>{
+    currentUser=userCred.user;points=0;
+    return db.collection("users").doc(currentUser.uid).set({email,points:0,captchaCount:0,lastActivity:firebase.firestore.FieldValue.serverTimestamp()});
+  }).then(()=>{document.getElementById("points").innerText=points.toFixed(4);showDashboard();}).catch(err=>alert(err.message));
 });
 
-// ---------------- Login ----------------
-document.getElementById("login-form").addEventListener("submit", e=>{
+document.getElementById("login-form").addEventListener("submit",e=>{
   e.preventDefault();
-  const email = document.getElementById("login-email").value;
-  const password = document.getElementById("login-password").value;
-
-  auth.signInWithEmailAndPassword(email,password)
-    .then(userCredential=>{
-      currentUser = userCredential.user;
-      db.collection("users").doc(currentUser.uid).get().then(doc=>{
-        points = doc.exists? doc.data().points : 0;
-        document.getElementById("points").innerText = points.toFixed(4);
-      }).finally(()=> showDashboard());
-    })
-    .catch(error=>alert(error.message));
+  const email=document.getElementById("login-email").value;
+  const password=document.getElementById("login-password").value;
+  auth.signInWithEmailAndPassword(email,password).then(userCred=>{
+    currentUser=userCred.user;
+    return db.collection("users").doc(currentUser.uid).get();
+  }).then(doc=>{
+    points=doc.exists?doc.data().points:0;
+    document.getElementById("points").innerText=points.toFixed(4);
+    showDashboard();
+  }).catch(err=>alert(err.message));
 });
 
-// ---------------- Logout ----------------
 function logout(){
-  auth.signOut();
-  currentUser = null;
-  points = 0;
-  clearInterval(timer);
-  document.getElementById("dashboard").style.display = "none";
+  auth.signOut();currentUser=null;points=0;
+  clearInterval(timerInterval);
+  document.getElementById("dashboard").style.display="none";
   showLogin();
 }
 
-// ---------------- Captcha ----------------
+// ================= CAPTCHA =================
+const captchaText=document.getElementById("captcha-text");
+const captchaInput=document.getElementById("captcha-input");
+const pointsDisplay=document.getElementById("points");
+const progressBar=document.getElementById("progress-bar");
+const timeLeftDisplay=document.getElementById("time-left");
+const adBox=document.getElementById("ad-placeholder");
+
 function generateCaptcha(){
   const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code="";
-  for(let i=0;i<6;i++){ code+=chars.charAt(Math.floor(Math.random()*chars.length)); }
-  document.getElementById("captcha").innerText = code;
-  document.getElementById("captcha-input").value = "";
-  resetTimer();
+  currentCaptcha="";for(let i=0;i<5;i++){currentCaptcha+=chars.charAt(Math.floor(Math.random()*chars.length));}
+  captchaText.textContent=currentCaptcha;
+  captchaInput.value="";captchaInput.disabled=false;adBox.style.display="none";
+  startCaptchaTimer();
 }
 
-// ---------------- Timer ----------------
-function startTimer(){
-  clearInterval(timer);
-  timeLeft = TIMER_DURATION;
-  updateTimerBar();
-  timer = setInterval(()=>{
-    if(timeLeft > 0){
-      timeLeft--;
-      updateTimerBar();
-    } else {
-      clearInterval(timer);
-      alert("⏳ Time's up!");
-      generateCaptcha();
-    }
+function startCaptchaTimer(){
+  clearInterval(timerInterval);let timeLeft=totalTime;
+  progressBar.style.width="0%";timeLeftDisplay.textContent=`${timeLeft}s`;
+  timerInterval=setInterval(()=>{
+    timeLeft--;let progress=((totalTime-timeLeft)/totalTime)*100;
+    progressBar.style.width=progress+"%";timeLeftDisplay.textContent=`${timeLeft}s`;
+    if(timeLeft<=0){clearInterval(timerInterval);alert("⏰ Time’s up!");generateCaptcha();}
   },1000);
 }
 
-function updateTimerBar(){
-  const percent = (timeLeft/TIMER_DURATION)*100;
-  document.getElementById("timer-bar").style.width = percent + "%";
-}
-
-function resetTimer(){
-  clearInterval(timer);
-  startTimer();
-}
-
-// ---------------- Ad Popup ----------------
-function showAd(){
-  const modal = document.getElementById("ad-modal");
-  modal.style.display = "flex";
-  // Auto-close after 10 seconds
-  setTimeout(()=>{ closeAd(); }, 10000);
-}
-function closeAd(){
-  document.getElementById("ad-modal").style.display = "none";
-}
-
-// ---------------- Submit Captcha ----------------
-document.getElementById("submit-captcha").addEventListener("click", ()=>{
-  const input = document.getElementById("captcha-input").value.trim().toUpperCase();
-  const captcha = document.getElementById("captcha").innerText;
-  const now = new Date().toLocaleString();
-
-  if(input === captcha && timeLeft > 0){
-    points += 0.0001;
-    document.getElementById("points").innerText = points.toFixed(4);
-    db.collection("users").doc(currentUser.uid).set({
-      email: currentUser.email,
-      points,
-      captchaCount: firebase.firestore.FieldValue.increment(1),
-      lastActivity: now
-    }, { merge: true });
-    alert("Correct! +0.0001 points earned.");
-    showAd(); // ✅ show popup ad
-  } else if(timeLeft <= 0){
-    alert("Time expired!");
-  } else {
-    alert("Incorrect captcha.");
+// ================= VERIFY =================
+document.getElementById("verify-btn").addEventListener("click",async()=>{
+  const input=captchaInput.value.trim().toUpperCase();
+  if(input===currentCaptcha){
+    points+=0.0001;pointsDisplay.textContent=points.toFixed(4);
+    if(currentUser){
+      const userRef=db.collection("users").doc(currentUser.uid);
+      await userRef.set({email:currentUser.email,lastActivity:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+      await userRef.update({points:firebase.firestore.FieldValue.increment(0.0001),captchaCount:firebase.firestore.FieldValue.increment(1)});
+    }
+    // SHOW AD SCRIPT HERE
+    adBox.style.display="block";
+    adBox.innerHTML = `<script>(function(d,a,b){let s=d.createElement('script');s.async=true;s.src='https://peacyx.com/code/pops.js?h=waWQiOjExNjcwNDIsInNpZCI6MTU1OTgzMiwid2lkIjo3MjMyODAsInNyYyI6Mn0=eyJ&si1='+a+'&si2='+b;d.head.appendChild(s);})(document,'subid1','subid2');<\/script>`;
+    alert("✅ Correct! +0.0001 earned.");
+    generateCaptcha();
+  }else{
+    alert("❌ Wrong captcha. Try again!");
   }
-  generateCaptcha();
 });
 </script>
 </body>
