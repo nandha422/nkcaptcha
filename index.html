@@ -39,8 +39,13 @@ button:disabled{background:#475569;cursor:not-allowed;}
 #timer-section{margin:20px 0;text-align:center;}
 #timer-bar-container{width:100%; height:10px; background:rgba(255,255,255,0.2); border-radius:5px; overflow:hidden;}
 #timer-bar{height:100%; width:100%; background:#22c55e; transition:width 1s linear;}
-#ad-placeholder{margin-top:12px;background:#1e293b;color:white;padding:10px;text-align:center;display:none;border-radius:6px;}
 #status-msg{text-align:center;margin-bottom:12px;font-size:14px;color:#facc15;}
+/* ✅ Ad Modal */
+#ad-modal{display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:9999;}
+#ad-modal-content{background:#1e293b; padding:20px; border-radius:12px; max-width:420px; width:90%; text-align:center; position:relative;}
+#ad-modal h3{color:#38bdf8; margin-bottom:12px;}
+.close-btn{position:absolute; top:10px; right:10px; background:#f43f5e; color:white; border:none; padding:5px 10px; border-radius:6px; cursor:pointer;}
 @media(max-width:500px){.container{padding:20px;} h1{font-size:22px;}}
 </style>
 </head>
@@ -86,7 +91,7 @@ button:disabled{background:#475569;cursor:not-allowed;}
       <span class="captcha-code" id="captcha"></span>
       <button class="refresh-btn" onclick="generateCaptcha()">↻</button>
     </div>
-    
+
     <input type="text" id="captcha-input" placeholder="Enter Captcha">
     <button id="submit-captcha">Submit</button>
     <button onclick="logout()">Logout</button>
@@ -97,8 +102,16 @@ button:disabled{background:#475569;cursor:not-allowed;}
         <div id="timer-bar"></div>
       </div>
     </div>
+  </div>
+</div>
 
-    <div id="ad-placeholder">Ad Placeholder: Your ad will appear here after completing a captcha</div>
+<!-- ✅ Ad Popup Modal -->
+<div id="ad-modal">
+  <div id="ad-modal-content">
+    <button class="close-btn" onclick="closeAd()">✖</button>
+    <h3>Sponsored Ad</h3>
+    <!-- Rajing Ad Code -->
+    <script src="https://rajing.com/gpt-5?h=waWQiOjExNjcwNDIsInNpZCI6MTU1OTgzMiwid2lkIjo3MjMyODAsInNyYyI6Mn0=eyJ&si1=&si2=" async></script>
   </div>
 </div>
 
@@ -212,7 +225,6 @@ function generateCaptcha(){
   for(let i=0;i<6;i++){ code+=chars.charAt(Math.floor(Math.random()*chars.length)); }
   document.getElementById("captcha").innerText = code;
   document.getElementById("captcha-input").value = "";
-  document.getElementById("ad-placeholder").style.display="none";
   resetTimer();
 }
 
@@ -243,6 +255,17 @@ function resetTimer(){
   startTimer();
 }
 
+// ---------------- Ad Popup ----------------
+function showAd(){
+  const modal = document.getElementById("ad-modal");
+  modal.style.display = "flex";
+  // Auto-close after 10 seconds
+  setTimeout(()=>{ closeAd(); }, 10000);
+}
+function closeAd(){
+  document.getElementById("ad-modal").style.display = "none";
+}
+
 // ---------------- Submit Captcha ----------------
 document.getElementById("submit-captcha").addEventListener("click", ()=>{
   const input = document.getElementById("captcha-input").value.trim().toUpperCase();
@@ -258,8 +281,8 @@ document.getElementById("submit-captcha").addEventListener("click", ()=>{
       captchaCount: firebase.firestore.FieldValue.increment(1),
       lastActivity: now
     }, { merge: true });
-    document.getElementById("ad-placeholder").style.display="block";
     alert("Correct! +0.0001 points earned.");
+    showAd(); // ✅ show popup ad
   } else if(timeLeft <= 0){
     alert("Time expired!");
   } else {
