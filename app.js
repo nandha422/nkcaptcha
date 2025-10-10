@@ -1,4 +1,4 @@
-// Firebase configuration
+// ---------------- Firebase Configuration ----------------
 const firebaseConfig = {
   apiKey: "AIzaSyBjkSg5mcAdcNLtNXVEt3OWBnyJYc0kSM4",
   authDomain: "captcha-e2954.firebaseapp.com",
@@ -11,30 +11,39 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// ---------------- Global Variables ----------------
 let currentUser = null;
 let points = 0;
 let timer;
-let timeLeft = 30;
 const TIMER_DURATION = 30;
+let timeLeft = TIMER_DURATION;
 let currentCaptcha = "";
 
 // ---------------- UI Functions ----------------
 function showLogin() {
   document.getElementById("signup-section").style.display = "none";
-  document.getElementById("login-section").style.display = "block";
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("login-section").style.display = "flex";
 }
+
 function showSignup() {
   document.getElementById("login-section").style.display = "none";
-  document.getElementById("signup-section").style.display = "block";
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("signup-section").style.display = "flex";
 }
+
 function showDashboard() {
-  document.getElementById("signup-section").style.display = "none";
   document.getElementById("login-section").style.display = "none";
+  document.getElementById("signup-section").style.display = "none";
   document.getElementById("dashboard").style.display = "block";
   generateCaptcha();
   resetTimer();
   startTimer();
 }
+
+// ---------------- Firebase Persistence ----------------
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .catch(err => console.error("Persistence error:", err));
 
 // ---------------- Signup ----------------
 document.getElementById("signup-form").addEventListener("submit", e => {
@@ -42,62 +51,62 @@ document.getElementById("signup-form").addEventListener("submit", e => {
   const email = document.getElementById("signup-email").value;
   const password = document.getElementById("signup-password").value;
   const termsChecked = document.getElementById("terms-checkbox").checked;
-  if(!termsChecked){ alert("Please agree to Terms & Conditions."); return; }
 
-  auth.createUserWithEmailAndPassword(email,password)
+  if (!termsChecked) {
+    alert("Please agree to Terms & Conditions.");
+    return;
+  }
+
+  auth.createUserWithEmailAndPassword(email, password)
     .then(userCredential => {
       currentUser = userCredential.user;
       points = 0;
-      db.collection("users").doc(currentUser.uid).set({points, captchaCount: 0, lastActivity: new Date().toLocaleString()})
-        .then(() => showDashboard());
+      return db.collection("users").doc(currentUser.uid).set({
+        email,
+        points,
+        captchaCount: 0,
+        lastActivity: new Date().toLocaleString()
+      });
+    })
+    .then(() => {
       document.getElementById("points").innerText = points.toFixed(4);
+      showDashboard();
     })
     .catch(error => alert(error.message));
 });
 
 // ---------------- Login ----------------
-document.getElementById("login-form").addEventListener("submit", e=>{
+document.getElementById("login-form").addEventListener("submit", e => {
   e.preventDefault();
   const email = document.getElementById("login-email").value;
   const password = document.getElementById("login-password").value;
 
-  auth.signInWithEmailAndPassword(email,password)
-    .then(userCredential=>{
+  auth.signInWithEmailAndPassword(email, password)
+    .then(userCredential => {
       currentUser = userCredential.user;
-      db.collection("users").doc(currentUser.uid).get()
-        .then(doc=>{
-          points = doc.exists ? doc.data().points : 0;
-          document.getElementById("points").innerText = points.toFixed(4);
-        })
-        .finally(()=> showDashboard());
+      return db.collection("users").doc(currentUser.uid).get();
     })
-    .catch(error=> alert(error.message));
-});
-
-
-auth.signInWithEmailAndPassword(email,password)
-  .then(userCredential=>{
-    currentUser = userCredential.user;
-    db.collection("users").doc(currentUser.uid).get().then(doc=>{
+    .then(doc => {
       if (doc.exists) {
         points = doc.data().points || 0;
         document.getElementById("points").innerText = points.toFixed(4);
+      } else {
+        points = 0;
       }
       showDashboard();
-    });
-  })
+    })
+    .catch(error => alert(error.message));
+});
 
-
-
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 // ---------------- Logout ----------------
 function logout() {
-  auth.signOut();
-  currentUser = null;
-  points = 0;
-  clearInterval(timer);
-  document.getElementById("dashboard").style.display = "none";
-  showLogin();
+  auth.signOut().then(() => {
+    currentUser = null;
+    points = 0;
+    clearInterval(timer);
+    document.getElementById("dashboard").style.display = "none";
+    showLogin();
+  });
 }
 
 // ---------------- Generate Captcha ----------------
@@ -124,7 +133,7 @@ function startTimer() {
   timer = setInterval(() => {
     timeLeft--;
     document.getElementById("timer-display").innerText = timeLeft;
-    if(timeLeft <= 0){
+    if (timeLeft <= 0) {
       clearInterval(timer);
       alert("⏰ Time’s up! New captcha generated.");
       generateCaptcha();
@@ -140,17 +149,15 @@ function resetTimer() {
 }
 
 // ---------------- Submit Captcha ----------------
-document.getElementById("submit-captcha").addEventListener("click", ()=>{
+document.getElementById("submit-captcha").addEventListener("click", () => {
   const input = document.getElementById("captcha-input").value.trim().toUpperCase();
   const captcha = document.getElementById("captcha").innerText;
   const now = new Date().toLocaleString();
 
-  if(input === captcha && timeLeft > 0){
-    // Increment points
+  if (input === captcha && timeLeft > 0) {
     points += 0.0001;
     document.getElementById("points").innerText = points.toFixed(4);
 
-    // Update Firebase
     db.collection("users").doc(currentUser.uid).set({
       email: currentUser.email,
       points,
@@ -158,22 +165,30 @@ document.getElementById("submit-captcha").addEventListener("click", ()=>{
       lastActivity: now
     }, { merge: true });
 
-    // Show ad placeholder dynamically
+    // Show ad box
     const adBox = document.getElementById("ad-placeholder");
-    adBox.style.display = "block";
-    adBox.innerHTML = "Loading ad...";
-    
-    // Inject ad script
+    adBox.style.display = "flex";
+    adBox.style.justifyContent = "center";
+    adBox.style.alignItems = "center";
+    adBox.innerHTML = `<p>Loading ad...</p>`;
+
+    // Inject ad script dynamically
     const adScript = document.createElement("script");
     adScript.src = "https://peacyx.com/code/pops.js?h=waWQiOjExNjcwNDIsInNpZCI6MTU1OTgzMiwid2lkIjo3MjMyODAsInNyYyI6Mn0=eyJ&si1=subid1&si2=subid2";
     adScript.async = true;
     adBox.appendChild(adScript);
 
-  } else if(timeLeft <= 0){
+    // After a few seconds, hide the ad and show next captcha
+    setTimeout(() => {
+      adBox.style.display = "none";
+      generateCaptcha();
+    }, 5000);
+
+  } else if (timeLeft <= 0) {
     alert("⏳ Time expired!");
+    generateCaptcha();
   } else {
     alert("❌ Incorrect captcha.");
+    generateCaptcha();
   }
-
-  generateCaptcha(); // refresh captcha & reset timer
 });
