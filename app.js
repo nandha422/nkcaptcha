@@ -74,6 +74,22 @@ document.getElementById("login-form").addEventListener("submit", e=>{
     .catch(error=> alert(error.message));
 });
 
+
+auth.signInWithEmailAndPassword(email,password)
+  .then(userCredential=>{
+    currentUser = userCredential.user;
+    db.collection("users").doc(currentUser.uid).get().then(doc=>{
+      if (doc.exists) {
+        points = doc.data().points || 0;
+        document.getElementById("points").innerText = points.toFixed(4);
+      }
+      showDashboard();
+    });
+  })
+
+
+
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 // ---------------- Logout ----------------
 function logout() {
   auth.signOut();
