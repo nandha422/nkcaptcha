@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <title>NK CAPTCHA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -53,7 +52,6 @@ button:disabled{background:#475569;cursor:not-allowed;}
   <a href="about.html">About</a>
   <a href="privacy.html">Privacy</a>
   <a href="terms.html">Terms</a>
-  <a href="admin-login.html">Admin</a>
 </nav>
 
 <div class="container">
@@ -85,13 +83,11 @@ button:disabled{background:#475569;cursor:not-allowed;}
     <h2>Dashboard</h2>
     <p class="points">Points: <span id="points">0</span></p>
 
-    <!-- Captcha box -->
     <div class="captcha-box">
       <span class="captcha-code" id="captcha"></span>
       <button class="refresh-btn" onclick="generateCaptcha()">↻</button>
     </div>
 
-    <!-- Timer bar -->
     <div id="timer-section">
       <h3>Captcha Timer</h3>
       <div id="timer-bar-container">
@@ -99,12 +95,10 @@ button:disabled{background:#475569;cursor:not-allowed;}
       </div>
     </div>
 
-    <!-- Captcha input and submit -->
     <input type="text" id="captcha-input" placeholder="Enter Captcha">
     <button id="submit-captcha">Submit</button>
     <button onclick="logout()">Logout</button>
 
-    <!-- Ad placeholder -->
     <div id="ad-placeholder"></div>
   </div>
 </div>
@@ -264,9 +258,7 @@ document.getElementById("submit-captcha").addEventListener("click", ()=>{
     adBox.style.display="block";
     adBox.innerHTML = "Loading ad...";
     const adScript = document.createElement("script");
-    adScript.src = "https://peacyx.com/code/pops.js?h=waWQiOjExNjcwNDIsInNpZCI6MTU1OTgzMiwid2lkIjo3MjMyODAsInNyYyI6Mn0=eyJ&si1=subid1&si2=subid2";
-    adScript.async = true;
-    adBox.appendChild(adScript);
+    
 
     alert("Correct! +0.0001 points earned.");
   } else if(timeLeft<=0){
